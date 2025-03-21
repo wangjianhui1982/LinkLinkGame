@@ -1,0 +1,216 @@
+import BaseComponent from "../../Script/BaseComponent";
+import { Wzhcq_StorageName } from "../../Script/Enum";
+import { Utils } from "../../Script/Utils";
+import ResourceLoader from "./ResourceLoader";
+import RopeTexture from "./RopeTexture";
+import PaintBoard from "./paintBoard";
+
+const { ccclass, property } = cc._decorator;
+
+@ccclass
+export default class GamePlay extends BaseComponent {
+
+    @property(PaintBoard)
+    paintBoard: PaintBoard = null;
+
+    @property(cc.EditBox)
+    levelEditBox: cc.EditBox = null;
+
+    @property(cc.Label)
+    boardLevel: cc.Label = null;
+
+    @property(cc.Node)
+    levelRoot: cc.Node = null;
+
+    @property(cc.Prefab)
+    ropePrefab: cc.Prefab = null;
+
+    @property(cc.ProgressBar)
+    progressBar: cc.ProgressBar = null;
+
+    @property(cc.Label)
+    progressLabel: cc.Label = null;
+
+    @property(cc.Node)
+    startNode: cc.Node = null;
+
+    targets = [];
+    totalTargetCount = 0;
+
+    ROPE_MAX_LEVEL = 500;
+    level: any = 0;
+
+    onLoad() {
+        this.levelEditBox.node.on('editing-did-began', this.onEditBegin, this);
+        this.levelEditBox.node.on('text-changed', this.onTextChanged, this);
+
+        this.EventMgr.on(this.EventMgr.Wzhcq_EVENT_NAMES.DRAWCOLOR, this.checkTargetFinish, this);
+        this.EventMgr.on(this.EventMgr.Wzhcq_EVENT_NAMES.REMOVEALLROPE, this.removeAll, this);
+
+    }
+
+    protected start(): void {
+
+    }
+
+    protected onEnable(): void {
+        this.level = Utils.getInstance.Wzhcq_getItem(Wzhcq_StorageName.boardIndex);//this.levelEditBox.string;
+        this.boardLevel.string = "No." + this.level;
+        this.loadLevel();
+        this.paintBoard.initData();
+    }
+
+    closeBtn() {
+        this.node.active = false;
+        this.paintBoard.clearAllCells();
+
+        Utils.getInstance.Wzhcq_setItem(Wzhcq_StorageName.boardIndex, this.level + 1);
+        this.EventMgr.emit(this.EventMgr.Wzhcq_EVENT_NAMES.Wzhcq_GAME_SUCCESS);
+    }
+
+    onEditBegin(event: any) {
+        console.log('Editing began');
+    }
+
+    onTextChanged(event: any) {
+        console.log('Text changed:', event.string);
+        this.level = event.string;
+
+        this.loadLevel();
+    }
+
+    getBundleName(Maoxian_level: any) {
+        let Maoxian_Index = this.getLevelIndex(Maoxian_level);
+        if (Maoxian_Index <= 30) {
+            return "Levels1";
+        }
+        else if (Maoxian_Index <= 60) {
+            return "Levels2";
+        }
+        else if (Maoxian_Index <= 100) {
+            return "Levels3";
+        }
+        else if (Maoxian_Index <= 200) {
+            return "Levels4";
+        }
+        else if (Maoxian_Index <= 300) {
+            return "Levels5";
+        }
+        else if (Maoxian_Index <= 400) {
+            return "Levels6";
+        }
+        else {
+            return "Levels7";
+        }
+    }
+
+    getLevelIndex(Maoxian_level: any) {
+        let Maoxian_Index = Maoxian_level;
+        if (Maoxian_level > this.ROPE_MAX_LEVEL) {
+            Maoxian_Index = ((Maoxian_level - 1) % this.ROPE_MAX_LEVEL) + 1;
+        }
+        return Maoxian_Index;
+    };
+
+    loadLevel() {
+
+        let self = this;
+        let bundleName = this.getBundleName(this.level);
+
+        if (this.level == "") {
+            this.level = 0;
+        }
+        else if (this.level > 500) {
+            this.level = 500;
+        }
+        let res = ResourceLoader.getInstance.load(bundleName, "json/lv_" + this.level, cc.JsonAsset);
+        res.then((res2) => {
+            self.initGame(res2.json);
+        })
+    };
+
+    initGame(res: any) {
+        // let data = {};
+        // data["r"] = res.width;
+        // data["c"] = res.height;
+        // data["s"] = [];
+
+        // let layers = res.layers;
+        // for (let i = 0; i < layers.length; i++) {
+        //     let value = layers[i];
+
+        // }
+        this.progressBar.progress = 0;
+        this.progressLabel.string = 0 + "%";
+
+        this.initPaintBoard(res)
+    };
+
+    initPaintBoard(data: any) {
+        this.paintBoard.loadGridData(data);
+    };
+
+    createRopeNode(temp_node: any, type: any, amplitude: any) {
+        if (void 0 === amplitude) {
+            amplitude = 20;
+        }
+        var node = cc.instantiate(this.ropePrefab);
+        this.levelRoot.addChild(node, cc.macro.MAX_ZINDEX);
+        var script = node.getComponent(RopeTexture);
+        script.type = type;
+        script.amplitude = amplitude;
+        script.updateEndPoint(0, 0);
+        var position = this.convertToNodeSpaceAR(temp_node, node.parent);
+        node.position = position;
+        return script;
+    };
+
+    convertToNodeSpaceAR(node: any, parent: any) {
+        var position = node.parent.convertToWorldSpaceAR(node.position);
+        return parent.convertToNodeSpaceAR(position);
+    };
+
+    getProgress() {
+        return (this.paintBoard.history.length - this.paintBoard.drawHistory.length) / this.paintBoard.history.length;
+    };
+
+    removeAll() {
+        if (this.levelRoot.children.length > 0) {
+            this.levelRoot.removeAllChildren();
+        }
+    }
+
+    checkTargetFinish(colorIndex: any) {
+        var self = this;
+        cc.log("finish");
+
+        var o = this.createRopeNode(this.startNode, colorIndex, undefined);
+
+        var n = this.paintBoard.drawWithColor(colorIndex, function (e, n) {
+            var i = self.paintBoard.getCellPosition(e.x, e.y);
+            var a = self.paintBoard.gridContainer.convertToWorldSpaceAR(i);
+            var s = o.node.convertToNodeSpaceAR(a);
+            o.moveToTarget(s.x, s.y, 0.05);
+            // $overallSystem.mgrs().soundMgr.playEffect("merge_4", "Feibiao", !1, 0.05);
+            // $overallSystem.sers().platformSrv.platformApi.vibrateShort(!1);
+            if (n) {
+                o.destroyByReset();
+
+                if (isFinished) {
+                    self.paintBoard.isFinished();
+                }
+            }
+        });
+        var duration = n.duration;
+        var isFinished = n.isFinished;
+        cc.log("isFinish", isFinished);
+
+        if (isFinished) {
+            this.levelRoot.removeAllChildren();
+        }
+        this.progressBar.progress = this.getProgress();
+        this.progressLabel.string = (100 * this.getProgress()).toFixed(0) + "%";
+    };
+
+
+}

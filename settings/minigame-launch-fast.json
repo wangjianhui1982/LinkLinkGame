@@ -1,0 +1,26 @@
+{
+    "launchFast": false,
+    "bgColor": [
+        0,
+        0,
+        0,
+        1
+    ],
+    "imageFile": "first.jpg",
+    "imageRatio": 1,
+    "imageMode": "0",
+    "barRatio": 0.45,
+    "barOffset": -0.25,
+    "barBgColor": [
+        100,
+        111,
+        118,
+        1
+    ],
+    "barColor": [
+        61,
+        197,
+        222,
+        1
+    ]
+}

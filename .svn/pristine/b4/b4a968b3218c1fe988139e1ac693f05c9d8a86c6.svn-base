@@ -1,0 +1,115 @@
+import BaseComponent from "../../Script/BaseComponent";
+import { Wzhcq_StorageName } from "../../Script/Enum";
+import ResourceLoader from "../../Script/ResourceLoader";
+import { Utils } from "../../Script/Utils";
+
+const { ccclass, property } = cc._decorator;
+
+@ccclass
+export default class tujianItem extends BaseComponent {
+
+    @property(cc.Node)
+    itemArray: cc.Node[] = [];
+
+    tar: any;
+    m_index = 0;
+    curLevel: any;
+
+    MaxLv: any;
+
+    updateCell(event: any, index: any) {
+        index = Math.floor(index);
+        this.m_index = index;
+
+        this.MaxLv = Utils.getInstance.Wzhcq_getItem(Wzhcq_StorageName.boardIndex) + 1;
+
+        let level: number;
+        if (this.MaxLv % 3 == 0) {
+            level = this.MaxLv;
+        }
+        else {
+            level = this.MaxLv + (3 - this.MaxLv % 3);
+        }
+
+
+        if (!(level / 3 <= index)) {
+            for (let i = 0; i < this.itemArray.length; i++) {
+                this.setLv(this.itemArray[i], i + index * 3);
+            }
+        }
+    }
+
+    Refresh() {
+        this.updateCell(null, this.m_index);
+    }
+
+    playAnim(node: any, name: any, bool: any) {
+        if (bool === undefined) {
+            bool = 0;
+        }
+
+        return Utils.getInstance.playWithNode(node, name, false, bool);
+    }
+
+    setLv(node: cc.Node, index: number) {
+        let self = this;
+
+        if (index >= this.MaxLv) {
+            node.active = false;
+        }
+        else {
+            node.active = true;
+
+            let bg = node.getChildByName("bg");
+            let bg2 = node.getChildByName("bg2");
+            let num = node.getChildByName("title").getChildByName("num");
+            let icon = node.getChildByName("iconBg").getChildByName("icon");
+            let btn = node.getChildByName("btn");
+            let selected = node.getChildByName("selected");
+            let name = node.getChildByName("name");
+
+            btn._index = index;
+            if (index == this.MaxLv - 1) {
+                bg.active = true;
+                bg2.active = false;
+                name.active = true;
+                btn.active = false;
+            }
+            else {
+                bg2.active = true;
+                bg.active = false;
+                name.active = false;
+                btn.active = true;
+            }
+
+            let selectedIndex = Utils.getInstance.Wzhcq_getItem(Wzhcq_StorageName.selectedIndex);
+            if (selectedIndex == index) {
+                selected.active = true;
+                btn.active = false;
+            }
+            else {
+                selected.active = false;
+            }
+
+            num.getComponent(cc.Label).string = "No." + index;
+
+            let bundleName = Utils.getInstance.getBundleName(index);
+            let res = ResourceLoader.getInstance.load(bundleName, "icons/" + index, cc.SpriteFrame);
+            res.then((spritaFrame: any) => {
+                icon.getComponent(cc.Sprite).spriteFrame = spritaFrame;
+            })
+
+            btn.off(cc.Node.EventType.TOUCH_END);
+            btn.on(cc.Node.EventType.TOUCH_END, this.itemBtnClick, this);
+        }
+    }
+
+    itemBtnClick(event: any, type: any) {
+        let index = event.target._index;
+
+        Utils.getInstance.Wzhcq_setItem(Wzhcq_StorageName.selectedIndex, index);
+        this.EventMgr.emit(this.EventMgr.Wzhcq_EVENT_NAMES.UPDATEBOARDSPRITE, undefined);
+
+        this.Refresh();
+    }
+}

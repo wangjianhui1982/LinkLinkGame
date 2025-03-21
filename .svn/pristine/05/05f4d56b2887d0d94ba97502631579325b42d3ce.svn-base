@@ -1,0 +1,38 @@
+{
+  "ver": "2.3.7",
+  "uuid": "6ce7b04b-8c85-440c-a185-1af854409429",
+  "importer": "texture",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 219,
+  "height": 58,
+  "platformSettings": {},
+  "subMetas": {
+    "每日挑战": {
+      "ver": "1.0.6",
+      "uuid": "926435df-cc3e-4c92-8cc8-7a9cf80d09ef",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "6ce7b04b-8c85-440c-a185-1af854409429",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0.5,
+      "offsetY": 0,
+      "trimX": 4,
+      "trimY": 0,
+      "width": 212,
+      "height": 58,
+      "rawWidth": 219,
+      "rawHeight": 58,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

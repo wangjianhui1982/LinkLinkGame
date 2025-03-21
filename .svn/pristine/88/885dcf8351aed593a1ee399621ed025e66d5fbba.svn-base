@@ -1,0 +1,35 @@
+"use strict";
+cc._RF.push(module, 'e22a7PviyNFFalIHKAbc7c7', 'GameNextRank');
+// Script/GameNextRank.js
+
+"use strict";
+
+cc.Class({
+  "extends": cc.Component,
+  properties: {
+    backSprite: cc.Node,
+    avatarImgSprite: cc.Sprite,
+    nickLabel: cc.Label,
+    topScoreLabel: cc.Label
+  },
+  start: function start() {},
+  init: function init(data) {
+    var avatarUrl = data.avatarUrl;
+    var nick = data.nickname;
+    var grade = data.KVDataList.length != 0 ? data.KVDataList[0].value : 0;
+    this.createImage(avatarUrl);
+    this.nickLabel.string = nick;
+    this.topScoreLabel.string = grade;
+  },
+  createImage: function createImage(avatarUrl) {
+    var _this = this;
+
+    cc.assetManager.loadRemote(avatarUrl, {
+      ext: '.jpg'
+    }, function (err, texture) {
+      _this.avatarImgSprite.spriteFrame = new cc.SpriteFrame(texture);
+    });
+  }
+});
+
+cc._RF.pop();

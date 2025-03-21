@@ -1,0 +1,37 @@
+<div class="container">
+    <h2>小游戏启动优化</h2>
+    <ui-box-container class="layout vertical">
+        <div>
+            <ui-prop name="快速启动优化" type="boolean" v-value="launchFast"></ui-prop>
+            <ui-prop name="背景颜色">
+                <ui-color v-value="bgColor"></ui-color>
+            </ui-prop>
+            <ui-prop name="图片名称">
+                <ui-input v-value="imageFile"></ui-input>
+            </ui-prop>
+            <ui-prop name="图片展示比例" tooltip="相对屏幕宽度或高度（根据适配方式决定）的比例">
+                <ui-slider v-value="imageRatio" min="0" max="1" step="0.1"></ui-slider>
+            </ui-prop>
+            <ui-prop name="适配方式" v-value="imageMode" type="enum" tooltip="填充适配有可能超出边界，内容适配可能有留白">
+                <div class="user-content">
+                    <option value=0>填充适配</option>
+                    <option value=1>内容适配</option>
+                </div>
+            </ui-prop>
+            <ui-prop name="进度条展示比例" tooltip="相对屏幕宽度的比例">
+                <ui-slider v-value="barRatio" min="0" max="1" step="0.1"></ui-slider>
+            </ui-prop>
+            <ui-prop name="进度条位置" tooltip="距离中心点的位置，向上为正，向下为负">
+                <ui-slider v-value="barOffset" min="-1" max="1" step="0.1"></ui-slider>
+            </ui-prop>
+            <ui-prop name="进度条背景颜色">
+                <ui-color v-value="barBgColor"></ui-color>
+            </ui-prop>
+            <ui-prop name="进度条颜色">
+                <ui-color v-value="barColor"></ui-color>
+            </ui-prop>
+        </div>
+        <hr />
+        <ui-button class="button blue big" v-disabled="isSaving" @click="saveConfig()">保存</ui-button>
+    </ui-box-container>
+</div>

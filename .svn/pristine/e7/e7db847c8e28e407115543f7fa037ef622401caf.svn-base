@@ -1,0 +1,195 @@
+import AudioManager from "../../Script/AudioManager";
+import BaseComponent from "../../Script/BaseComponent";
+import { Wzhcq_StorageName } from "../../Script/Enum";
+import ResourceLoader from "../../Script/ResourceLoader";
+import { Utils } from "../../Script/Utils";
+import RopeTexture from "./RopeTexture";
+import PaintBoard from "./paintBoard";
+
+const { ccclass, property } = cc._decorator;
+
+@ccclass
+export default class GamePlay extends BaseComponent {
+
+    @property(PaintBoard)
+    paintBoard: PaintBoard = null;
+
+    @property(cc.EditBox)
+    levelEditBox: cc.EditBox = null;
+
+    @property(cc.Label)
+    boardLevel: cc.Label = null;
+
+    @property(cc.Node)
+    levelRoot: cc.Node = null;
+
+    @property(cc.Prefab)
+    ropePrefab: cc.Prefab = null;
+
+    @property(cc.ProgressBar)
+    progressBar: cc.ProgressBar = null;
+
+    @property(cc.Label)
+    progressLabel: cc.Label = null;
+
+    @property(cc.Label)
+    segmentLabel: cc.Label = null;
+
+    @property(cc.Node)
+    startNode: cc.Node = null;
+
+    targets = [];
+    totalTargetCount = 0;
+
+    level: any = 0;
+
+    onLoad() {
+        this.levelEditBox.node.on('editing-did-began', this.onEditBegin, this);
+        this.levelEditBox.node.on('text-changed', this.onTextChanged, this);
+
+        this.EventMgr.on(this.EventMgr.Wzhcq_EVENT_NAMES.DRAWCOLOR, this.checkTargetFinish, this);
+        this.EventMgr.on(this.EventMgr.Wzhcq_EVENT_NAMES.REMOVEALLROPE, this.removeAll, this);
+
+    }
+
+    protected start(): void {
+
+    }
+
+    protected onEnable(): void {
+        this.level = Utils.getInstance.Wzhcq_getItem(Wzhcq_StorageName.boardIndex);//this.levelEditBox.string;
+        this.boardLevel.string = "No." + this.level;
+
+        let segmentCount = Utils.getInstance.Wzhcq_getItem(Wzhcq_StorageName.segmentCount);
+        this.segmentLabel.string = segmentCount;
+
+        this.loadLevel();
+        this.paintBoard.initData();
+    }
+
+    updateSegmentCount() {
+        let segmentCount = Utils.getInstance.Wzhcq_getItem(Wzhcq_StorageName.segmentCount);
+        if (segmentCount > 0) {
+            segmentCount -= 1;
+        }
+        this.segmentLabel.string = segmentCount;
+        Utils.getInstance.Wzhcq_setItem(Wzhcq_StorageName.segmentCount, segmentCount);
+    }
+
+    closeBtn() {
+        this.node.active = false;
+        this.paintBoard.clearAllCells();
+
+        Utils.getInstance.Wzhcq_setItem(Wzhcq_StorageName.boardIndex, this.level + 1);
+        this.EventMgr.emit(this.EventMgr.Wzhcq_EVENT_NAMES.Wzhcq_GAME_SUCCESS);
+    }
+
+    onEditBegin(event: any) {
+        console.log('Editing began');
+    }
+
+    onTextChanged(event: any) {
+        console.log('Text changed:', event.string);
+        this.level = event.string;
+
+        this.loadLevel();
+    }
+
+    loadLevel() {
+
+        let self = this;
+        let bundleName = Utils.getInstance.getBundleName(this.level);
+
+        if (this.level == "") {
+            this.level = 0;
+        }
+        else if (this.level > 500) {
+            this.level = 500;
+        }
+        let res = ResourceLoader.getInstance.load(bundleName, "json/lv_" + this.level, cc.JsonAsset);
+        res.then((res2) => {
+            self.initGame(res2.json);
+        })
+    };
+
+    initGame(res: any) {
+        this.progressBar.progress = 0;
+        this.progressLabel.string = 0 + "%";
+
+        this.initPaintBoard(res)
+    };
+
+    initPaintBoard(data: any) {
+        this.paintBoard.loadGridData(data);
+    };
+
+    createRopeNode(temp_node: any, type: any, amplitude: any) {
+        if (void 0 === amplitude) {
+            amplitude = 20;
+        }
+        var node = cc.instantiate(this.ropePrefab);
+        this.levelRoot.addChild(node, cc.macro.MAX_ZINDEX);
+        var script = node.getComponent(RopeTexture);
+        script.type = type;
+        script.amplitude = amplitude;
+        script.updateEndPoint(0, 0);
+        var position = this.convertToNodeSpaceAR(temp_node, node.parent);
+        node.position = position;
+        return script;
+    };
+
+    convertToNodeSpaceAR(node: any, parent: any) {
+        var position = node.parent.convertToWorldSpaceAR(node.position);
+        return parent.convertToNodeSpaceAR(position);
+    };
+
+    getProgress() {
+        return (this.paintBoard.history.length - this.paintBoard.drawHistory.length) / this.paintBoard.history.length;
+    };
+
+    removeAll() {
+        if (this.levelRoot.children.length > 0) {
+            this.levelRoot.removeAllChildren();
+        }
+    }
+
+    checkTargetFinish(colorIndex: any) {
+        var self = this;
+        cc.log("finish");
+
+        var o = this.createRopeNode(this.startNode, colorIndex, undefined);
+
+        var n = this.paintBoard.drawWithColor(colorIndex, function (e, n) {
+            var i = self.paintBoard.getCellPosition(e.x, e.y);
+            var a = self.paintBoard.gridContainer.convertToWorldSpaceAR(i);
+            var s = o.node.convertToNodeSpaceAR(a);
+            o.moveToTarget(s.x, s.y, 0.05);
+
+            AudioManager.instance.playAudiomerge_4();
+            Utils.getInstance.vibrateShort();
+
+            if (n) {
+                o.destroyByReset();
+
+                if (isFinished) {
+                    self.paintBoard.isFinished();
+                }
+                else {
+                    self.paintBoard.changeAutoPlaying();
+                    self.updateSegmentCount();
+                }
+            }
+        });
+        var duration = n.duration;
+        var isFinished = n.isFinished;
+        cc.log("isFinish", isFinished);
+
+        if (isFinished) {
+            this.levelRoot.removeAllChildren();
+        }
+        this.progressBar.progress = this.getProgress();
+        this.progressLabel.string = (100 * this.getProgress()).toFixed(0) + "%";
+    };
+
+
+}

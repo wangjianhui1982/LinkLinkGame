@@ -1,0 +1,30 @@
+import AudioManager from "./AudioManager";
+import BaseComponent from "./BaseComponent";
+import { Utils } from "./Utils";
+
+const { ccclass, property } = cc._decorator;
+
+@ccclass
+export default class ShuffleMask extends BaseComponent {
+
+    @property(cc.Node)
+    protected mask: cc.Node = null;
+
+    protected onLoad(): void {
+
+    }
+
+    updateMask(node: any) {
+        this.mask.width = node.width;
+        this.mask.height = node.height;
+        this.mask.x = node.x;
+        this.mask.y = node.y;
+    }
+
+    AbandonGame() {
+        AudioManager.instance.playAudioBtn_Click();
+
+        this.EventMgr.emit(this.EventMgr.Wzhcq_EVENT_NAMES.Wzhcq_GAME_FAIL);
+        this.node.active = false;
+    }
+}

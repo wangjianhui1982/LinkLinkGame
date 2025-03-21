@@ -1,0 +1,66 @@
+import AudioManager from "./AudioManager";
+import BaseComponent from "./BaseComponent";
+import { Wzhcq_StorageName } from "./Enum";
+import { Utils } from "./Utils";
+import { WxPlatform } from "./WxPlatform";
+
+const { ccclass, property } = cc._decorator;
+
+@ccclass
+export default class GameOver extends BaseComponent {
+
+    protected onLoad(): void {
+        cc.tween(this.node)
+            .to(0.3, { scale: 1 }, { easing: cc.easing.circOut })
+            .start();
+
+    }
+
+    protected onEnable(): void {
+        cc.tween(this.node)
+            .to(0.3, { scale: 1 }, { easing: cc.easing.circOut })
+            .start();
+
+        this.initData();
+        this.EventMgr.emit(this.EventMgr.Wzhcq_EVENT_NAMES.Wzhcq_REPORT_RESULT, 1);
+    }
+
+    initData() {
+        WxPlatform.getInstance.showBanner();
+
+        Utils.getInstance.Wzhcq_setItem(Wzhcq_StorageName.Wzhcq_Guide, 0);
+
+        // WxPlatform.getInstance.showInterstitialAd(() => {
+        //     WxPlatform.getInstance.CreateCustomAd5(5, () => {
+        //     });
+        // });
+    }
+
+    Wzhcq_clickNext_Btn() {
+        AudioManager.instance.playAudioBtn_Click();
+
+        Utils.getInstance.GameType = 2;
+
+        let Wzhcq_life = Utils.getInstance.Wzhcq_getItem(Wzhcq_StorageName.Wzhcq_Life);
+        if (Wzhcq_life > 0) {
+            let Wzhcq_cur_time = Math.round(new Date().getTime() / 1000);
+            Utils.getInstance.Wzhcq_setItem(Wzhcq_StorageName.Wzhcq_CurEnergyTime, Wzhcq_cur_time);
+
+            this.EventMgr.emit(this.EventMgr.Wzhcq_EVENT_NAMES.Wzhcq_RESTARTGAME, 1);
+        }
+        else {
+            this.EventMgr.emit(this.EventMgr.Wzhcq_EVENT_NAMES.Wzhcq_CREATE_ENERGY, undefined);
+        }
+
+        this.close();
+    }
+
+    close() {
+        this.node.active = false;
+        this.node.scale = 0;
+
+        WxPlatform.getInstance.hideBanner();
+
+    }
+
+}

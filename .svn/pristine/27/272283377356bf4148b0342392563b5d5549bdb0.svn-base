@@ -1,0 +1,38 @@
+{
+  "ver": "2.3.7",
+  "uuid": "a32e597f-3b49-4825-a187-81ceb6a3b5dc",
+  "importer": "texture",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 128,
+  "height": 128,
+  "platformSettings": {},
+  "subMetas": {
+    "Wall corner tower_southwest": {
+      "ver": "1.0.6",
+      "uuid": "df82dc2f-2d4f-4166-9bb4-79e419b12e1b",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "a32e597f-3b49-4825-a187-81ceb6a3b5dc",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 6,
+      "offsetY": 6,
+      "trimX": 12,
+      "trimY": 0,
+      "width": 116,
+      "height": 116,
+      "rawWidth": 128,
+      "rawHeight": 128,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

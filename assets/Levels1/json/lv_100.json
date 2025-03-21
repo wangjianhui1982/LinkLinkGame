@@ -1,0 +1,15 @@
+{ "class":"0",
+ "columns":1,
+ "image":"..\/..\/..\/Tiled\/Texture\/1.png",
+ "imageheight":14,
+ "imagewidth":14,
+ "margin":0,
+ "name":"0",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":14,
+ "tilewidth":14,
+ "type":"tileset",
+ "version":1.1
+}

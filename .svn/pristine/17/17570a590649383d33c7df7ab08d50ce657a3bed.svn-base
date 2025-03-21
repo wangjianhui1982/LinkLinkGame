@@ -1,0 +1,61 @@
+import ResourceLoader from "../../Script/ResourceLoader";
+
+const { ccclass, property } = cc._decorator;
+
+@ccclass
+export default class RopeSegmentManager {
+
+    private static instance: RopeSegmentManager = null;
+    public static get getInstance(): RopeSegmentManager {
+        if (RopeSegmentManager.instance == null) {
+            RopeSegmentManager.instance = new RopeSegmentManager();
+        }
+        return RopeSegmentManager.instance;
+    }
+
+    segmentPools = new Map();
+
+    getSegment(key: any) {
+        if (this.segmentPools.has(key)) {
+
+        }
+        else {
+            this.segmentPools.set(key, new cc.NodePool());
+        }
+
+        let pool = this.segmentPools.get(key);
+        if (pool.size() <= 0) {
+            let node = new cc.Node("RopeSegment");
+            let sprite = node.addComponent(cc.Sprite);
+            ResourceLoader.getInstance.load("paintBoard", "segment/" + (key + 1), cc.SpriteFrame)
+                .then(function (spriteFrame: any) {
+                    sprite.spriteFrame = spriteFrame;
+                });
+
+            pool.put(node);
+        }
+        return pool.get();
+    };
+
+    putSegment(key: any, node: any) {
+        let pool = this.segmentPools.get(key);
+        if (pool) {
+            pool.put(node);
+        }
+    };
+
+    clearPool(key: any) {
+        var pool = this.segmentPools.get(key);
+        if (pool) {
+            pool.clear();
+            this.segmentPools.delete(key);
+        }
+    };
+
+    clearAllPools() {
+        this.segmentPools.forEach(function (pool) {
+            return pool.clear();
+        });
+        this.segmentPools.clear();
+    };
+}

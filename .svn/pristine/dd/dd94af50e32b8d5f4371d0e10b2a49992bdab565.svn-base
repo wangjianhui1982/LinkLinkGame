@@ -1,0 +1,28 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "rankitemBg",
+    "texture": "78a32d91-9c12-4c25-9d11-846a83e127c2",
+    "atlas": "",
+    "rect": [
+      0,
+      0,
+      148,
+      142
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "originalSize": [
+      148,
+      142
+    ],
+    "capInsets": [
+      58,
+      0,
+      59,
+      0
+    ]
+  }
+}

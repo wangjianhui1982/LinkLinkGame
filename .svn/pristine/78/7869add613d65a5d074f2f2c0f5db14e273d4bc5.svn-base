@@ -1,0 +1,51 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "water",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 0.8333333333333334,
+  "sample": 60,
+  "speed": 1,
+  "wrapMode": 1,
+  "curveData": {
+    "comps": {
+      "cc.Sprite": {
+        "fillRange": [
+          {
+            "frame": 0,
+            "value": 0
+          },
+          {
+            "frame": 0.16666666666666666,
+            "value": 0.2
+          },
+          {
+            "frame": 0.3333333333333333,
+            "value": 0.4
+          },
+          {
+            "frame": 0.5,
+            "value": 0.6
+          },
+          {
+            "frame": 0.6666666666666666,
+            "value": 0.8
+          },
+          {
+            "frame": 0.8333333333333334,
+            "value": 1
+          }
+        ],
+        "spriteFrame": [
+          {
+            "frame": 0.016666666666666666,
+            "value": {
+              "__uuid__": "5d25b2b8-bb8e-4b38-9652-07905115a8fb"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "events": []
+}

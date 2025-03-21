@@ -1,0 +1,55 @@
+import BaseComponent from '../BaseComponent';
+import { Utils } from '../Utils';
+
+const { ccclass, property } = cc._decorator;
+
+@ccclass
+export default class Grid extends BaseComponent {
+    public pos: string;
+
+    protected onLoad(): void {
+
+        if (Utils.getInstance.GameType == 4) {
+            this.node.scale = Utils.getInstance.levelData[Utils.getInstance.GameType].scale;
+        }
+        else if (Utils.getInstance.GameType == 1 ||
+            Utils.getInstance.GameType == 2 ||
+            Utils.getInstance.GameType == 3 ||
+            Utils.getInstance.GameType == 5 ||
+            Utils.getInstance.GameType == 6) {
+            if (Utils.getInstance.pixelRatioHeight <= 800 && Utils.getInstance.GameType == 3) {
+                this.node.scale = 0.9;
+            }
+            else if (Utils.getInstance.GameType == 6) {
+                this.node.scale = Utils.getInstance.meiritiaozhanData[Utils.getInstance.GameType].scale;
+            }
+            else {
+                this.node.scale = Utils.getInstance.levelData[Utils.getInstance.GameType].scale;
+            }
+
+        }
+        else if (Utils.getInstance.GameType == 7) {
+            if (Utils.getInstance.StoreyIndex == 0) {
+                this.node.scale = 1.3125;
+            }
+            else if (Utils.getInstance.StoreyIndex == 1) {
+                this.node.scale = 1.125;
+            }
+            else if (Utils.getInstance.StoreyIndex == 2) {
+                this.node.scale = 1;
+            }
+        }
+    }
+
+    SetTipNodeVisible(visible:any): void {
+        this.node.active = visible;
+    }
+
+    setColor() {
+        this.node.getChildByName('Back').color = cc.color(33, 123, 123);
+    }
+
+    clearColor() {
+        this.node.getChildByName('Back').color = cc.color(255, 255, 255);
+    }
+}

@@ -1,0 +1,13 @@
+
+ts.png
+size: 26,191
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+2
+  rotate: false
+  xy: 2, 2
+  size: 22, 187
+  orig: 22, 230
+  offset: 0, 1
+  index: -1
